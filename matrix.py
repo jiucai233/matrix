@@ -9,42 +9,54 @@ class Matrix:
         self.row = len(matrix)
         self.col = len(matrix[0])
 
-    def __repr__(self):
-        return '\n'.join([' '.join(map(str, row)) for row in self.matrix])
+    def __str__(self):
+        return str(self.matrix)
 
     def __add__(self, other):
         if self.row != other.row or self.col != other.col:
-            raise SizeMismatchException("行列のサイズが一致していません")
-        result = [[self.matrix[i][j] + other.matrix[i][j] for j in range(self.col)] for i in range(self.row)]
-        return Matrix(result)
+            raise ValueError("Matrices must have the same dimensions for addition")
+
+        result_matrix = [[0 for _ in range(self.col)] for _ in range(self.row)]
+        for row in range(self.row):
+            for col in range(self.col):
+                result_matrix[row][col] = self.matrix[row][col] + other.matrix[row][col]
+        return Matrix(result_matrix)
+
+    def __sub__(self, other):
+        if self.row != other.row or self.col != other.col:
+            raise ValueError("Matrices must have the same dimensions for subtraction")
+
+        result_matrix = [[0 for _ in range(self.col)] for _ in range(self.row)]
+        for row in range(self.row):
+            for col in range(self.col):
+                result_matrix[row][col] = self.matrix[row][col] - other.matrix[row][col]
+        return Matrix(result_matrix)
 
     def __mul__(self, other):
         if self.col != other.row:
-            raise SizeMismatchException("第1の行列の列数と第2の行列の行数が一致していません")
-        result = [[sum(self.matrix[i][k] * other.matrix[k][j] for k in range(other.col)) for j in range(other.col)] for i in range(self.row)]
-        return Matrix(result)
+            raise ValueError("Matrices must have compatible dimensions for multiplication")
 
-# 行列A
-A = Matrix([[1, 2],
-            [3, 4],
-            [5, 6]])
+        result_matrix = [[0 for _ in range(other.col)] for _ in range(self.row)]
+        for i in range(self.row):
+            for j in range(other.col):
+                for k in range(self.col):
+                    result_matrix[i][j] += self.matrix[i][k] * other.matrix[k][j]
+        return Matrix(result_matrix)
 
-# 行列B
-B = Matrix([[7, 8, 9],
-            [10, 11, 12]])
-
-# 行列の足し算
+# Example usage
+A = Matrix([[1, 2], [3, 4]])
+B = Matrix([[3, 4], [5, 6]])
+C = Matrix([[3,4],[5,6],[1,2]])
+D = Matrix([[3,4,5],[5,6,7]])
+print(A)
+print(A + B)  
+print(A * D) 
 try:
-    C = A + B
-    print("行列 A + B:")
-    print(C)
-except SizeMismatchException as e:
+    print(A + C)
+except Exception as e:
     print(e)
 
-# 行列の掛け算
 try:
-    D = A * B
-    print("行列 A * B:")
-    print(D)
-except SizeMismatchException as e:
+    print(A * C)
+except Exception as e:
     print(e)
